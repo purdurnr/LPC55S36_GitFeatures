@@ -40,6 +40,7 @@
 #include "LPC55S36.h"
 #include "fsl_debug_console.h"
 /* TODO: insert other include files here. */
+#include "fsl_power.h"
 
 /* TODO: insert other definitions and declarations here. */
 /*******************************************************************************
@@ -93,6 +94,8 @@ void FLEXCOMM0_FLEXCOMM_IRQHANDLER(void) {
 
 int main(void) {
 
+	uint8_t system_active;
+
     /* Init board hardware. */
     BOARD_InitBootPins();
     BOARD_InitBootClocks();
@@ -116,25 +119,35 @@ int main(void) {
     }
 
     /* Enter an infinite loop, just incrementing a counter. */
+    g_systickCounter = 5000U; // 5 seconds until low power mode
+    system_active = 0;
+
     while(1) {
 
     	switch(g_uart_ch)
     	{
     	case 1:
-         	GPIO_PortSet(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, 1u << BOARD_LED_RED_GPIO_PIN);
-        	        g_uart_ch = 0 ;
-    	break ;
+        	system_active = 1;
+        	GPIO_PortSet(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, 1u << BOARD_LED_RED_GPIO_PIN);
+        	g_uart_ch = 0 ;
+    		break ;
 
     	case 2:
-        		GPIO_PortClear(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, 1u << BOARD_LED_RED_GPIO_PIN);
-        		g_uart_ch = 0 ;
-    	break ;
+        	system_active = 0;
+        	g_systickCounter = 3000U; // 3 seconds until low power mode
+        	GPIO_PortClear(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, 1u << BOARD_LED_RED_GPIO_PIN);
+        	g_uart_ch = 0 ;
+    		break ;
 
     	default:
-    		;
+    		if ((g_systickCounter==0) && (system_active == 0))
+    		{
+    			POWER_EnterSleep();
+    		};
 
     	}
-     }
+}
+
 
 
 
