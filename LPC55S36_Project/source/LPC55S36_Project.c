@@ -69,18 +69,43 @@ void SysTick_DelayTicks(uint32_t n)
 /*
  * @brief   Application entry point.
  */
+
+uint8_t g_uart_ch;
+
+/* FLEXCOMM0_IRQn interrupt handler */
+void FLEXCOMM0_FLEXCOMM_IRQHANDLER(void) {
+  /*  Place your code here */
+    uint32_t StatusFlags;
+
+    StatusFlags= USART_GetStatusFlags(BOARD_DEBUG_UART_BASEADDR);
+        /* If new data arrived. */
+    if ((kUSART_RxFifoNotEmptyFlag | kUSART_RxError) & StatusFlags )
+    {
+    	g_uart_ch = USART_ReadByte(BOARD_DEBUG_UART_BASEADDR);
+    	g_uart_ch = g_uart_ch - '0';
+    }
+  /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F
+     Store immediate overlapping exception return operation might vector to incorrect interrupt. */
+  #if defined __CORTEX_M && (__CORTEX_M == 4U)
+    __DSB();
+  #endif
+}
+
 int main(void) {
 
     /* Init board hardware. */
     BOARD_InitBootPins();
     BOARD_InitBootClocks();
     BOARD_InitBootPeripherals();
+    USART_DisableInterrupts(BOARD_DEBUG_UART_BASEADDR, kStatus_USART_TxIdle);
+    EnableIRQ(FLEXCOMM0_FLEXCOMM_IRQN);
+
 #ifndef BOARD_INIT_DEBUG_CONSOLE_PERIPHERAL
     /* Init FSL debug console. */
-    BOARD_InitDebugConsole();
+    //BOARD_InitDebugConsole();
 #endif
 
-    PRINTF("Hello World\n");
+//    PRINTF("Hello World\n");
 
     /* Set systick reload value to generate 1ms interrupt */
     if (SysTick_Config(SystemCoreClock / 1000U))
@@ -90,12 +115,26 @@ int main(void) {
         }
     }
 
-    while (1)
-    {
-        /* Delay 1000 ms */
-        SysTick_DelayTicks(1000U);
-        GPIO_PortToggle(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, 1u << BOARD_LED_RED_GPIO_PIN);
-    }
+    /* Enter an infinite loop, just incrementing a counter. */
+    while(1) {
+
+    	switch(g_uart_ch)
+    	{
+    	case 1:
+         	GPIO_PortSet(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, 1u << BOARD_LED_RED_GPIO_PIN);
+        	        g_uart_ch = 0 ;
+    	break ;
+
+    	case 2:
+        		GPIO_PortClear(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, 1u << BOARD_LED_RED_GPIO_PIN);
+        		g_uart_ch = 0 ;
+    	break ;
+
+    	default:
+    		;
+
+    	}
+     }
 
 
 
