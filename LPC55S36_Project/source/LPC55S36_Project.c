@@ -1,4 +1,6 @@
 /*
+ * Kyle is so cool, he should instruct all sessions from now on
+ *
  * Copyright 2016-2022 NXP
  * All rights reserved.
  *
