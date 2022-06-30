@@ -65,6 +65,30 @@ void BOARD_InitPins(void); /* Function assigned for the Cortex-M33 */
  */
 void MyLEDInit(void); /* Function assigned for the Cortex-M33 */
 
+/*!
+ * @brief Select Digital mode: Enable Digital mode. Digital input is enabled. */
+#define PIO1_8_DIGIMODE_DIGITAL 0x01u
+/*!
+ * @brief Mode select (on-chip pull-up/pull-down resistor control): Pull-up. Pull-up resistor enabled. */
+#define PIO1_8_MODE_PULL_UP 0x02u
+
+/*! @name PIO1_8 (number 36), J8[1]/P1_8-FC0_CTS-PWM0_A2
+  @{ */
+
+/* Symbols to be used with GPIO driver */
+#define EMTRIGGERINIT_EMTrig_GPIO GPIO                /*!<@brief GPIO peripheral base pointer */
+#define EMTRIGGERINIT_EMTrig_GPIO_PIN_MASK (1U << 8U) /*!<@brief GPIO pin mask */
+#define EMTRIGGERINIT_EMTrig_PORT 1U                  /*!<@brief PORT peripheral base pointer */
+#define EMTRIGGERINIT_EMTrig_PIN 8U                   /*!<@brief PORT pin number */
+#define EMTRIGGERINIT_EMTrig_PIN_MASK (1U << 8U)      /*!<@brief PORT pin mask */
+                                                      /* @} */
+
+/*!
+ * @brief Configures pin routing and optionally pin electrical features.
+ *
+ */
+void EMTriggerInit(void); /* Function assigned for the Cortex-M33 */
+
 #if defined(__cplusplus)
 }
 #endif

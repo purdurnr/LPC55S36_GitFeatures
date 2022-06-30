@@ -92,6 +92,9 @@ void FLEXCOMM0_FLEXCOMM_IRQHANDLER(void) {
   #endif
 }
 
+#define EM_START GPIO_PortClear(EMTRIGGERINIT_EMTrig_GPIO, EMTRIGGERINIT_EMTrig_PORT, 1u << EMTRIGGERINIT_EMTrig_PIN);
+#define EM_STOP  GPIO_PortSet(EMTRIGGERINIT_EMTrig_GPIO, EMTRIGGERINIT_EMTrig_PORT, 1u << EMTRIGGERINIT_EMTrig_PIN);
+
 int main(void) {
 
 	uint8_t system_active;
@@ -142,7 +145,9 @@ int main(void) {
     	default:
     		if ((g_systickCounter==0) && (system_active == 0))
     		{
+    			EM_START;
     			POWER_EnterSleep();
+    			EM_STOP;
     		};
 
     	}

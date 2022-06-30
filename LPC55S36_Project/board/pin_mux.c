@@ -13,6 +13,8 @@ package_id: LPC55S36JBD100
 mcu_data: ksdk2_0
 processor_version: 11.0.0
 board: LPCXpresso55S36
+pin_labels:
+- {pin_num: '36', pin_signal: PIO1_8/FC0_CTS_SDA_SSEL0/SCT0_OUT1/FC4_SSEL2/FC1_SCK/PWM0_A2/AOI1_OUT2/TRIGOUT_6, label: 'J8[1]/P1_8-FC0_CTS-PWM0_A2', identifier: EMTrig}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -32,6 +34,7 @@ void BOARD_InitBootPins(void)
 {
     BOARD_InitPins();
     MyLEDInit();
+    EMTriggerInit();
 }
 
 /* clang-format off */
@@ -134,6 +137,56 @@ void MyLEDInit(void)
                          /* Select Digital mode: Enable Digital mode.
                           * Digital input is enabled. */
                          | IOCON_PIO_DIGIMODE(PIO1_28_DIGIMODE_DIGITAL));
+}
+
+/* clang-format off */
+/*
+ * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
+EMTriggerInit:
+- options: {callFromInitBoot: 'true', coreID: cm33_core0, enableClock: 'true'}
+- pin_list:
+  - {pin_num: '36', peripheral: GPIO, signal: 'PIO1, 8', pin_signal: PIO1_8/FC0_CTS_SDA_SSEL0/SCT0_OUT1/FC4_SSEL2/FC1_SCK/PWM0_A2/AOI1_OUT2/TRIGOUT_6, direction: OUTPUT,
+    gpio_init_state: 'true', mode: pullUp}
+ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
+ */
+/* clang-format on */
+
+/* FUNCTION ************************************************************************************************************
+ *
+ * Function Name : EMTriggerInit
+ * Description   : Configures pin routing and optionally pin electrical features.
+ *
+ * END ****************************************************************************************************************/
+/* Function assigned for the Cortex-M33 */
+void EMTriggerInit(void)
+{
+    /* Enables the clock for the I/O controller.: Enable Clock. */
+    CLOCK_EnableClock(kCLOCK_Iocon);
+
+    /* Enables the clock for the GPIO1 module */
+    CLOCK_EnableClock(kCLOCK_Gpio1);
+
+    gpio_pin_config_t EMTrig_config = {
+        .pinDirection = kGPIO_DigitalOutput,
+        .outputLogic = 1U
+    };
+    /* Initialize GPIO functionality on pin PIO1_8 (pin 36)  */
+    GPIO_PinInit(EMTRIGGERINIT_EMTrig_GPIO, EMTRIGGERINIT_EMTrig_PORT, EMTRIGGERINIT_EMTrig_PIN, &EMTrig_config);
+
+    IOCON->PIO[1][8] = ((IOCON->PIO[1][8] &
+                         /* Mask bits to zero which are setting */
+                         (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_MODE_MASK | IOCON_PIO_DIGIMODE_MASK)))
+
+                        /* Signal(function) select: PORT18 (pin 36) is configured as PIO1_8. */
+                        | IOCON_PIO_FUNC(0x00u)
+
+                        /* Mode select (on-chip pull-up/pull-down resistor control): Pull-up.
+                         * Pull-up resistor enabled. */
+                        | IOCON_PIO_MODE(PIO1_8_MODE_PULL_UP)
+
+                        /* Select Digital mode: Enable Digital mode.
+                         * Digital input is enabled. */
+                        | IOCON_PIO_DIGIMODE(PIO1_8_DIGIMODE_DIGITAL));
 }
 /***********************************************************************************************************************
  * EOF
