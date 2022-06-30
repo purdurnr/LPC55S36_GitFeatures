@@ -2,6 +2,8 @@
  * Copyright 2016-2022 NXP
  * All rights reserved.
  *
+ * Fun lab! Thanks for the Git intro and your patience. Helped me!
+ * There were a few funny image capture typos for file names. Other than that everything worked for me.
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
