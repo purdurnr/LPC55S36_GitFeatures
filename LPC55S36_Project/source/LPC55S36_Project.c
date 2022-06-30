@@ -42,6 +42,29 @@
 /* TODO: insert other include files here. */
 
 /* TODO: insert other definitions and declarations here. */
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
+volatile uint32_t g_systickCounter;
+
+/*******************************************************************************
+ * Code
+ ******************************************************************************/
+void SysTick_Handler(void)
+{
+    if (g_systickCounter != 0U)
+    {
+        g_systickCounter--;
+    }
+}
+
+void SysTick_DelayTicks(uint32_t n)
+{
+    g_systickCounter = n;
+    while (g_systickCounter != 0U)
+    {
+    }
+}
 
 /*
  * @brief   Application entry point.
@@ -59,14 +82,22 @@ int main(void) {
 
     PRINTF("Hello World\n");
 
-    /* Force the counter to be placed into memory. */
-    volatile static int i = 0 ;
-    /* Enter an infinite loop, just incrementing a counter. */
-    while(1) {
-        i++ ;
-        /* 'Dummy' NOP to allow source level single stepping of
-            tight while() loop */
-        __asm volatile ("nop");
+    /* Set systick reload value to generate 1ms interrupt */
+    if (SysTick_Config(SystemCoreClock / 1000U))
+    {
+        while (1)
+        {
+        }
     }
+
+    while (1)
+    {
+        /* Delay 1000 ms */
+        SysTick_DelayTicks(1000U);
+        GPIO_PortToggle(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, 1u << BOARD_LED_RED_GPIO_PIN);
+    }
+
+
+
     return 0 ;
 }
