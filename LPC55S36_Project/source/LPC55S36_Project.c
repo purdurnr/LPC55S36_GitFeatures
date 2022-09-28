@@ -2,6 +2,9 @@
  * Copyright 2016-2022 NXP
  * All rights reserved.
  *
+ *Part 4 was a bit flakey because of the wire connection
+ *Part
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
